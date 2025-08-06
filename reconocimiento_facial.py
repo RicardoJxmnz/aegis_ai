@@ -128,7 +128,8 @@ class ReconocimientoFacial:
 
         if not embedding_bytes:
             if hasattr(self, "label_estado") and self.label_estado.winfo_exists():
-                self.label_estado.config(text="Sin rostro detectable", fg="gray")
+                self.label_estado.config(text="", fg="gray")
+                self.limpiar_datos()
             return
 
         nuevo_embedding = torch.tensor(np.frombuffer(embedding_bytes, dtype=np.float32))
@@ -197,17 +198,24 @@ class ReconocimientoFacial:
                 self.label_imagen.config(image=imagen_tk)
                 self.label_imagen.image = imagen_tk  # <- Importante mantener la referencia
 
-                self.label_estado.config(text="Autorizado", fg="green")
+                if datos.get("Estatus") == True:
+                    self.label_estado.config(text="Autorizado", fg="green")
+                else:
+                    self.label_estado.config(text=f"Sin Autorización", fg="red")
+                #self.root.after(1000, self.limpiar_datos)
             else:
                 self.label_estado.config(text="Datos no encontrados", fg="red")
         else:
             self.label_estado.config(text=f"Desconocido", fg="red")
-            self.label_imagen.config(image=self.imagen_tk)
-            self.label_imagen.image = self.imagen_tk 
-            for entry in self.entradas.values():
+            self.limpiar_datos()
+
+    def limpiar_datos(self):
+        self.label_imagen.config(image=self.imagen_tk)
+        self.label_imagen.image = self.imagen_tk 
+        for entry in self.entradas.values():
                 entry.config(state="normal")  
                 entry.delete(0, tk.END)     
-                entry.config(state="readonly")  
+                entry.config(state="readonly")
 
     def cerrar(self):
         self.cap.release()          # Libera la cámara

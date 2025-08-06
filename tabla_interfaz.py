@@ -1,7 +1,7 @@
 import tkinter as tk
 from conexion_bd import*
 from gestor_imagen import GestorImagen
-
+from tkinter import messagebox
 
 class TablaBD:
     def __init__(self, treeview):
@@ -87,10 +87,6 @@ class Formulario:
         self.gestor_tablas = GestorTablas(db)
 
     def mostrar(self, tabla, columnas):
-        from tkcalendar import DateEntry
-        import tkinter as tk
-        from tkinter import ttk
-
         for widget in self.frame.winfo_children():
             widget.destroy()
         self.entradas.clear()
@@ -120,9 +116,14 @@ class Formulario:
 
             entrada = self._crear_widget(col, contenedor)
             entrada.pack(fill="x")
+            if col == "Id_Maestro":
+                entrada.config(state="disabled")
             self.entradas[col] = entrada
 
-        tk.Button(subframes[-1], text="Agregar", command=lambda: self.insertar_registro(tabla)).pack(pady=20)
+        tk.Button(subframes[-1], text="Modificar", command=lambda: self.modificar_registro(tabla)).pack(side="left",pady=20, padx=10)
+        tk.Button(subframes[-1], text="Agregar", command=lambda: self.insertar_registro(tabla)).pack(side="left",pady=20, padx=10)
+       
+        self.id_registro_actual = None  # Aquí guardaremos el ID al seleccionar una fila
 
     def _crear_widget(self, col, contenedor):
         from tkcalendar import DateEntry
@@ -181,5 +182,36 @@ class Formulario:
                 rows = self.db.ejecutar_consulta(ConsultasSQL.consulta_maestros)
                 columnas = self.db.obtener_columnas()
                 self.tabla_manager.mostrar_datos(columnas, rows)
-        
+    
+    def modificar_registro(self, tabla):
+        if self.id_registro_actual is None:
+            messagebox.showwarning("Advertencia", "Primero selecciona un registro haciendo doble clic en la tabla.")
+            return
+
+        self.leer_campos()
+
+        try:
+            if tabla == "Alumnos":
+                # Actualiza alumno
+                self.gestor_tablas.actualizar_alumno(self.id_registro_actual, self.datos)
+                # Refresca tabla
+                rows = self.db.ejecutar_consulta(ConsultasSQL.consulta_alumnos)
+                columnas = self.db.obtener_columnas()
+                self.tabla_manager.mostrar_datos(columnas, rows)
+
+            elif tabla == "Maestros":
+                self.gestor_tablas.actualizar_maestro(self.id_registro_actual, self.datos)
+                rows = self.db.ejecutar_consulta(ConsultasSQL.consulta_maestros)
+                columnas = self.db.obtener_columnas()
+                self.tabla_manager.mostrar_datos(columnas, rows)
+
+            else:
+                messagebox.showinfo("Aviso", "Modificación no implementada para esta tabla.")
+                return
+
+            messagebox.showinfo("Éxito", "Registro actualizado correctamente.")
+            self.id_registro_actual = None  # Limpiar estado de edición
+
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo modificar el registro:\n{e}")
 

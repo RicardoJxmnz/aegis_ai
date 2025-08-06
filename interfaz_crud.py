@@ -1,6 +1,7 @@
 from conexion_bd import DatabaseConexion
 from tabla_interfaz import*
 from tkinter import ttk
+import datetime
 
 class InterfazCrud:
     def __init__(self, ventana_principal = None, frame = None):
@@ -43,6 +44,7 @@ class InterfazCrud:
 
         self.tree = ttk.Treeview(self.frame_tabla)
         self.tree.pack(side="left", fill="both", expand=True)
+        self.tree.bind("<Double-1>", self.on_doble_click_fila)
 
         scroll_y = ttk.Scrollbar(self.frame_tabla, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=scroll_y.set)
@@ -58,6 +60,7 @@ class InterfazCrud:
 
         self.formulario = Formulario(self.frame_formulario, self.db, self.tabla_manager)
 
+
     def mostrar_tabla(self, nombre_tabla, consulta):
         rows = self.db.ejecutar_consulta(consulta)
         columnas = self.db.obtener_columnas()
@@ -70,3 +73,37 @@ class InterfazCrud:
 
     def mostrar(self):
         self.root.mainloop()
+
+    def on_doble_click_fila(self, event):
+        item_id = self.tree.identify_row(event.y)
+        col_id = self.tree.identify_column(event.x)
+
+        if not item_id:
+            return
+
+        col_index = int(col_id.replace("#", "")) - 1
+        valores = self.tree.item(item_id)["values"]
+
+        if col_index >= len(valores):
+            return
+
+        for col, val in zip(self.tabla_manager.columnas, valores):
+            entrada = self.formulario.entradas.get(col)
+            if entrada is None:
+                continue
+            if isinstance(entrada, ttk.Combobox):
+                entrada.set(val)
+            elif hasattr(entrada, "set_date"):
+                try:
+                    entrada.set_date(datetime.strptime(val, "%Y-%m-%d"))
+                except:
+                    pass
+            else:
+                entrada.delete(0, tk.END)
+                entrada.insert(0, val)
+
+        try:
+            self.formulario.id_registro_actual = valores[0]
+        except:
+            self.formulario.id_registro_actual = None
+

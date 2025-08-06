@@ -3,11 +3,9 @@ import threading
 import tkinter as tk
 from tkinter import Label
 from PIL import Image, ImageTk
-import torch
 from ultralytics import YOLO
-import io
-import numpy as np
 from gestor_imagen import GestorImagen
+from config import COLOR_CUERPO_PRINCIPAL
 
 class DeteccionIntrusos:
     def __init__(self, ventana_principal = None, frame = None):
@@ -23,7 +21,7 @@ class DeteccionIntrusos:
             self.root.title("Deteccion de Intrusos")
             self.root.geometry("900x550")
 
-        self.etiqueta_estado = Label(self.root, text="Inicializando...", font=("Arial Black", 22, "bold"), fg="blue")
+        self.etiqueta_estado = Label(self.root, text="Inicializando...", font=("Arial Black", 22, "bold"), fg="blue", bg=COLOR_CUERPO_PRINCIPAL)
         self.etiqueta_estado.pack()
 
         self.panel_video = Label(self.root)

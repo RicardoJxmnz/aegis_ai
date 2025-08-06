@@ -85,7 +85,7 @@ class GestorImagen:
 
         face = self.mtcnn(self.imagen_pil)
         if face is None:
-            print("No se detectó rostro.")
+            #print("No se detectó rostro.")
             return b''
         embedding = self.model(face.unsqueeze(0).to(self.device))
         embedding = embedding.detach().cpu()[0]

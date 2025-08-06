@@ -35,7 +35,7 @@ class ConsultasSQL:
     """
 
     consulta_maestros = """
-        SELECT P.Nombre, P.APaterno AS Apellido_Paterno, P.AMaterno AS Apellido_Materno,
+        SELECT M.Id_Maestro, P.Nombre, P.APaterno AS Apellido_Paterno, P.AMaterno AS Apellido_Materno,
         P.Fecha_Nacimiento, P.Sexo, M.Titulo, P.Activo
         FROM Maestros M
         JOIN Personas P ON P.Id_Persona = M.Id_Persona;
@@ -105,4 +105,83 @@ class GestorTablas:
                 datos.get("Titulo"),
             )
         )
+        self.db.commit()
+     
+    def actualizar_persona(self, id_persona, datos):
+        activo = 1 if datos.get("Activo", "").lower() == "activo" else 0
+
+        self.db.cursor.execute("""
+            UPDATE Personas
+            SET Nombre = ?, APaterno = ?, AMaterno = ?, Fecha_Nacimiento = ?, Sexo = ?, Activo = ?
+            WHERE Id_Persona = ?
+        """, (
+            datos.get("Nombre"),
+            datos.get("Apellido_Paterno"),
+            datos.get("Apellido_Materno"),
+            datos.get("Fecha_Nacimiento"),
+            datos.get("Sexo"),
+            activo,
+            id_persona
+        ))
+        self.db.commit()
+
+    def actualizar_alumno(self, matricula, datos):
+        # Obtener Id_Persona vinculado a la matrícula del alumno
+        resultado = self.db.cursor.execute(
+            "SELECT Id_Persona FROM Alumnos WHERE Matricula = ?",
+            (matricula,)
+        ).fetchone()
+
+        if resultado is None:
+            raise Exception("No se encontró el alumno con la matrícula proporcionada.")
+
+        id_persona = resultado[0]
+
+        # Actualizar tabla Personas
+        self.actualizar_persona(id_persona, datos)
+
+        # Obtener nuevo Id_Carrera
+        id_carrera = self.db.cursor.execute(
+            "SELECT Id_Carrera FROM Carreras WHERE Nombre = ?",
+            (datos.get("Carrera"),)
+        ).fetchone()[0]
+
+        # Actualizar tabla Alumnos
+        self.db.cursor.execute("""
+            UPDATE Alumnos
+            SET Grado = ?, Grupo = ?, Id_Carrera = ?
+            WHERE Matricula = ?
+        """, (
+            datos.get("Grado"),
+            datos.get("Grupo"),
+            id_carrera,
+            matricula
+        ))
+        self.db.commit()
+
+
+    def actualizar_maestro(self, id_maestro, datos):
+        # Obtener Id_Persona vinculado al maestro
+        resultado = self.db.cursor.execute(
+            "SELECT Id_Persona FROM Maestros WHERE Id_Maestro = ?",
+            (id_maestro,)
+        ).fetchone()
+
+        if resultado is None:
+            raise Exception("No se encontró el maestro con el ID proporcionado.")
+
+        id_persona = resultado[0]
+
+        # Actualizar tabla Personas
+        self.actualizar_persona(id_persona, datos)
+
+        # Actualizar tabla Maestros
+        self.db.cursor.execute("""
+            UPDATE Maestros
+            SET Titulo = ?
+            WHERE Id_Maestro = ?
+        """, (
+            datos.get("Titulo"),
+            id_maestro
+        ))
         self.db.commit()
