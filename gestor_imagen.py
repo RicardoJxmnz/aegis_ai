@@ -1,12 +1,3 @@
-from tkinter import filedialog
-from PIL import Image, ImageTk
-import cv2
-import numpy as np
-import io
-from facenet_pytorch import InceptionResnetV1, MTCNN
-import torch
-
-
 import threading
 import io
 import torch

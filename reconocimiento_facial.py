@@ -1,6 +1,7 @@
 import tkinter as tk
 from gestor_imagen import GestorImagen
 from conexion_bd import DatabaseConexion, ConsultasSQL
+from config import COLOR_CUERPO_PRINCIPAL
 from PIL import Image, ImageTk
 import cv2
 import numpy as np
@@ -47,20 +48,20 @@ class ReconocimientoFacial:
         frame_superiro = tk.Frame(self.root)
         frame_superiro.pack(side="top", fill="x")
 
-        self.label_estado = tk.Label(self.root, font=("Arial Black", 22, "bold"), fg="blue")
+        self.label_estado = tk.Label(self.root, font=("Arial Black", 22, "bold"), fg="blue", bg=COLOR_CUERPO_PRINCIPAL)
         self.label_estado.pack(pady=40)
 
         # Crear frame izquierdo 
-        frame_izquierda = tk.Frame(self.root)
+        frame_izquierda = tk.Frame(self.root, bg=COLOR_CUERPO_PRINCIPAL)
         frame_izquierda.pack(side="left", fill="both", expand=True)
         frame_izquierda.pack_propagate(False)
 
         # Crear frame derecho
-        frame_derecha = tk.Frame(self.root)
+        frame_derecha = tk.Frame(self.root, bg=COLOR_CUERPO_PRINCIPAL)
         frame_derecha.pack(side="right", fill="both", expand=True)
 
         # Cargar imagen
-        imagen_pil = Image.open("sin_imagen.png")  # Reemplaza con tu archivo
+        imagen_pil = Image.open("./imagenes/sin_imagen.png")  # Reemplaza con tu archivo
         imagen_pil = imagen_pil.resize((300, 320))
         self.imagen_tk = ImageTk.PhotoImage(imagen_pil)
 
@@ -70,16 +71,16 @@ class ReconocimientoFacial:
 
         self.label_imagen.place(relx=0.85, rely=0.5, anchor="e")  # Centrado vertical, alineado a la derecha  
 
-        formulario = tk.Frame(frame_derecha)
+        formulario = tk.Frame(frame_derecha, bg=COLOR_CUERPO_PRINCIPAL)
         formulario.place(relx=0.05, rely=0.5, anchor="w")  # Centrado verticalmente, alineado a la izquierda          
 
         campos = ["Nombre", "Matrícula", "Rol", "Titulo", "Grado", "Grupo", "Carrera", "Estatus"]
 
         for i, campo in enumerate(campos):
-            etiqueta = tk.Label(formulario, text=campo + ":", anchor="w", font=("Arial", 13, "bold"))
+            etiqueta = tk.Label(formulario, text=campo + ":", anchor="w", font=("Arial", 13, "bold"), bg=COLOR_CUERPO_PRINCIPAL)
             etiqueta.grid(row=i, column=0, sticky="w", pady=8, padx=12)
 
-            entrada = tk.Entry(formulario, width=35, font=("Arial", 13))
+            entrada = tk.Entry(formulario, width=35, font=("Arial", 13), bg=COLOR_CUERPO_PRINCIPAL)
             entrada.grid(row=i, column=1, pady=8, padx=12, ipady=4)
 
             self.entradas[campo] = entrada
