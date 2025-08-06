@@ -29,6 +29,18 @@ class AegisAI(tk.Tk):
         w, h = 1024, 600        
         util_ventana.centrar_ventana(self, w, h)        
 
+    def reiniciar(self):
+        self.cerrar_reconocimiento_si_existe()
+        if hasattr(self, 'cuerpo_principal') and self.cuerpo_principal.winfo_exists():
+            for widget in self.cuerpo_principal.winfo_children():
+                widget.destroy()
+        for widget in self.winfo_children():
+                widget.destroy()
+        self.paneles()
+        self.controles_barra_superior()        
+        self.controles_menu_lateral()
+        self.controles_cuerpo()
+
     def paneles(self):        
          # Crear paneles: barra superior, menú lateral y cuerpo principal
         self.barra_superior = tk.Frame(
@@ -51,12 +63,14 @@ class AegisAI(tk.Tk):
                                            command=self.toggle_panel, bd=0, bg=COLOR_BARRA_SUPERIOR, fg="white")
         self.buttonMenuLateral.pack(side=tk.LEFT)
 
-        # Etiqueta de título
+        """Etiqueta de título
         self.labelTitulo = tk.Label(self.barra_superior, text="AegisAI")
         self.labelTitulo.config(fg="#fff", font=(
             "Roboto", 15), bg=COLOR_BARRA_SUPERIOR, pady=1, width=10)
-        self.labelTitulo.pack(side=tk.LEFT)
+        self.labelTitulo.pack(side=tk.LEFT)"""
 
+        tk.Button(self.barra_superior, text="AegisAI", fg="#fff",activebackground=COLOR_BARRA_SUPERIOR,activeforeground="#fff",
+                  bd=0, highlightthickness=0, font=("Roboto", 16), bg=COLOR_BARRA_SUPERIOR, pady=3, width=8,relief="flat", command=self.reiniciar).pack(side=tk.LEFT)
 
         # Etiqueta de informacion
         self.labelTitulo = tk.Label(
