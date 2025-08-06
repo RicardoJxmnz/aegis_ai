@@ -44,10 +44,10 @@ class AegisAI(tk.Tk):
     
     def controles_barra_superior(self):
         # Configuración de la barra superior
-        font_awesome = font.Font(family='FontAwesome', size=12)
+        font_awesome = font.Font(family='Font Awesome 7 Free Solid', size=20)
 
         # Botón del menú lateral
-        self.buttonMenuLateral = tk.Button(self.barra_superior, text="☰", font=("Arial", 16),
+        self.buttonMenuLateral = tk.Button(self.barra_superior, text="\uf0c9", font=font_awesome,
                                            command=self.toggle_panel, bd=0, bg=COLOR_BARRA_SUPERIOR, fg="white")
         self.buttonMenuLateral.pack(side=tk.LEFT)
 
